@@ -1,0 +1,97 @@
+4. Implement linear and logistic regression.
+
+#LINEAR REGRESSION
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import sklearn.metrics as met
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+
+df = pd.read_csv('Advertising.csv')
+df.head()
+
+print(df.columns)
+
+df.drop(['Unnamed: 0'], axis=1, inplace=True)
+df.head()
+
+plt.figure(figsize=(16,8))
+plt.scatter(df['TV'], df['sales'], c='black')
+plt.xlabel('Money spent on TV')
+plt.ylabel('Sales')
+plt.show()
+
+x=df['TV'].values.reshape(-1,1)
+y=df['sales'].values.reshape(-1,1)
+print(x)
+print(y)
+
+Xtrain, Xtest, Ytrain, Ytest = train_test_split(x, y, test_size = 0.3)
+reg = LinearRegression()
+reg.fit(Xtrain, Ytrain)
+pred = reg.predict(Xtest)
+
+print("Slope=",reg.coef_[0][0])
+print("Intercept=",reg.intercept_[0])
+print("Y = {:.5}X + {:.5}".format(reg.coef_[0][0], reg.intercept_[0]))
+
+plt.figure(figsize=(16,8))
+plt.scatter(Xtest, Ytest, c='blue')
+plt.plot(Xtest, pred, c='black', linewidth=2)
+plt.xlabel('Money spent on TV')
+plt.ylabel('Sales')
+plt.show()
+
+rmse = np.sqrt(met.mean_squared_error(Ytest, pred))
+print("RMSE = ", rmse)
+
+r2 = met.r2_score(Ytest, pred)
+print("R2 = ",r2)
+
+
+
+
+
+#LOGISTIC REGRESSION
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import sklearn.metrics as met
+from sklearn.linear_model import LogisticRegression
+
+x = np.arange(10).reshape(-1,1)
+y = np.array([0,0,0,0,1,1,1,1,1,1])
+print(x)
+print(y)
+model = LogisticRegression(solver='liblinear', random_state=0)
+
+print(model.fit(x,y))
+
+print(model.classes_)
+
+print(model.coef_)
+
+print(model.intercept_)
+
+print(model.predict_proba(x))
+
+print(model.predict(x))
+print(model.score(x,y))
+
+cm = met.confusion_matrix(y, model.predict(x))
+
+fig, ax = plt.subplots(figsize=(8,8))
+ax.imshow(cm)
+ax.grid(False)
+ax.xaxis.set(ticks=(0,1), ticklabels=('Pred 0', 'Pred 1'))
+ax.yaxis.set(ticks=(0,1), ticklabels=('Act 0', 'Act 1'))
+for i in range (2):
+    for j in range (2):
+        ax.text(j, i, cm[i,j], ha='center', va='center', color='red')
+        
+plt.show()
+print(met.classification_report(y, model.predict(x)))
+
